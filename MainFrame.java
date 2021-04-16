@@ -17,8 +17,9 @@ public class MainFrame extends JFrame {
 
         // Initialization        
         Container frame_cp = getContentPane();
-        JButton btn_servMon = new JButton("Query Server");
-        JTextArea textArea_res = new JTextArea();
+        JButton btn_queryStatus = new JButton("Status");
+        JButton btn_ue = new JButton("UE");        
+        OutputArea textArea_res = new OutputArea();
         JScrollPane scr_res = new JScrollPane(textArea_res);
         JPanel panel_params = new JPanel();
         InputField field_ip = new InputField("ip"); 
@@ -38,16 +39,19 @@ public class MainFrame extends JFrame {
         frame_cp.setLayout(null);
         textArea_res.setEditable(false);
         textArea_res.setVisible(true);
+        textArea_res.setBackground(new Color(200, 200, 200));
+        textArea_res.setFont(new Font("Verdana",Font.PLAIN,12));
         panel_params.setLayout(new BoxLayout(panel_params, BoxLayout.PAGE_AXIS));
 
 
         // Element Positioning
-        btn_servMon.setBounds(150, 400, 300, 33);
+        btn_queryStatus.setBounds(150, 400, 300, 33);
+        btn_ue.setBounds(475, 400, 100, 33);        
         scr_res.setBounds(75, 30, 450, 175);
         panel_params.setBounds(150, 266, 300, 100);
 
         // Listeners
-        btn_servMon.addActionListener(new ActionListener() {
+        btn_queryStatus.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (field_ip.validInfo() && field_port.validInfo()) {
@@ -55,9 +59,9 @@ public class MainFrame extends JFrame {
                     try {                        
                         String ip = field_ip.getText();
                         int port = Integer.parseInt(field_port.getText());
-                        String response = Logic.query(ip,port);                        
+                        String response = Logic.queryStatus(ip,port);
                         for(String player : Logic.player_info(response)) {
-                            textArea_res.append(player+"\n");
+                            textArea_res.appendColoredText(player);
                         }
                     } catch (NumberFormatException nfe) {
                         nfe.printStackTrace();
@@ -66,12 +70,24 @@ public class MainFrame extends JFrame {
             }            
         });
 
+        btn_ue.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                field_ip.setText("64.94.95.202");
+                field_port.setText("29070");
+                
+            }            
+        });
+
+        
+
         // Adding Elements
         panel_params.add(new JLabel("Server Address:"));
         panel_params.add(field_ip);
         panel_params.add(new JLabel("Server Port:"));        
         panel_params.add(field_port);
-        frame_cp.add(btn_servMon);
+        frame_cp.add(btn_queryStatus);
+        frame_cp.add(btn_ue);        
         frame_cp.add(scr_res);
         frame_cp.add(panel_params);
 
