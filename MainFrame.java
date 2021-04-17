@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -39,8 +41,8 @@ public class MainFrame extends JFrame {
         frame_cp.setLayout(null);
         textArea_res.setEditable(false);
         textArea_res.setVisible(true);
-        textArea_res.setBackground(new Color(200, 200, 200));
-        textArea_res.setFont(new Font("Verdana",Font.PLAIN,12));
+        textArea_res.setBackground(new Color(180, 180, 180));
+        textArea_res.setFont(new Font("Verdana",Font.PLAIN,12));        
         panel_params.setLayout(new BoxLayout(panel_params, BoxLayout.PAGE_AXIS));
 
 
@@ -59,8 +61,12 @@ public class MainFrame extends JFrame {
                     try {                        
                         String ip = field_ip.getText();
                         int port = Integer.parseInt(field_port.getText());
-                        String response = Logic.queryStatus(ip,port);
-                        for(String player : Logic.player_info(response)) {
+                        textArea_res.setText("");
+                        String response = new String(Logic.queryStatus(ip,port).getBytes(),StandardCharsets.UTF_8);                        
+                        ArrayList<String> player_info = Logic.player_info(response);
+                        for(int i = 0; i < player_info.size(); i++) {
+                            String player = new String(player_info.get(i).getBytes(),StandardCharsets.UTF_8);
+                            //System.out.println(player);
                             textArea_res.appendColoredText(player);
                         }
                     } catch (NumberFormatException nfe) {

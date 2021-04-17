@@ -8,11 +8,16 @@ import java.awt.*;
 public class OutputArea extends JTextPane {
     
     public void appendColoredText(String text) {
-        StyledDocument document = getStyledDocument();
-        Style style = addStyle("", null);       
         
-        for (int i = 0; i < text.length(); i++) {            
-            if (text.charAt(i) == '^' && (text.charAt(i+1) >= '0' && text.charAt(i+1) <= '9')) {                
+        Style style = addStyle("", null);
+        StyleConstants.setBold(style, true);      
+        
+        for (int i = 0; i < text.length(); i++) {
+            if (i == 0 && text.charAt(i) != '^') {
+                StyleConstants.setForeground(style, Color.WHITE);
+                append_char(style, text.charAt(i));
+
+            } else if (text.charAt(i) == '^' && (text.charAt(i+1) >= '0' && text.charAt(i+1) <= '9')) {                
                 int color = Integer.parseInt(text.charAt(i+1)+"");                    
                 switch (color) {
                     case 0:
@@ -49,19 +54,20 @@ public class OutputArea extends JTextPane {
             } else if (text.charAt(i) >= '0' && text.charAt(i) <= '9') {
 
             } else {
-                try {                
-                    document.insertString(document.getLength(),text.charAt(i)+"", style);
-                } catch (BadLocationException ble) {                
-                    ble.printStackTrace();
-                }
+               append_char(style, text.charAt(i)); 
             }
              
             
         }
         // New line
-        try {
-            document.insertString(document.getLength(), "\n", style);
-        } catch (BadLocationException ble) {            
+        append_char(style, '\n');
+    }
+
+    private void append_char(Style style, char x) {
+        StyledDocument document = getStyledDocument();
+        try {                
+            document.insertString(document.getLength(),x+"", style);
+        } catch (BadLocationException ble) {                
             ble.printStackTrace();
         }
     }
