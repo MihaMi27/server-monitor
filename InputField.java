@@ -1,12 +1,14 @@
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.swing.JTextField;
-import java.util.regex.*;
 
 public class InputField extends JTextField{
     private String field_id;
     
 
     public InputField(String id) {
-        field_id = id;
+        field_id = id;        
     }
     
     public boolean validInfo() {
@@ -28,12 +30,10 @@ public class InputField extends JTextField{
                 }
             } catch (NumberFormatException nfe) {
                 nfe.printStackTrace();
-            }
-            
+            }            
         }
 
         return valid;
     }
-    
     
 }   

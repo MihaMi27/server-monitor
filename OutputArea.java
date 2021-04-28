@@ -1,74 +1,58 @@
-import javax.swing.JTextPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-import java.awt.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class OutputArea extends JTextPane {
-    
+import javax.swing.JLabel;
+
+public class OutputArea extends JLabel {
+
+    public OutputArea() {
+        setOpaque(false);        
+    }
+
     public void appendColoredText(String text) {
-        
-        Style style = addStyle("", null);
-        StyleConstants.setBold(style, true);      
-        
-        for (int i = 0; i < text.length(); i++) {
-            if (i == 0 && text.charAt(i) != '^') {
-                StyleConstants.setForeground(style, Color.WHITE);
-                append_char(style, text.charAt(i));
-
-            } else if (text.charAt(i) == '^' && (text.charAt(i+1) >= '0' && text.charAt(i+1) <= '9')) {                
-                int color = Integer.parseInt(text.charAt(i+1)+"");                    
-                switch (color) {
-                    case 0:
-                        StyleConstants.setForeground(style, Color.BLACK);
-                        break;
-                    case 1:
-                        StyleConstants.setForeground(style, Color.RED);
-                        break;
-                    case 2:
-                        StyleConstants.setForeground(style, Color.GREEN);
-                        break;
-                    case 3:
-                        StyleConstants.setForeground(style, Color.YELLOW);
-                        break;
-                    case 4:
-                        StyleConstants.setForeground(style, Color.BLUE);
-                        break;
-                    case 5:
-                        StyleConstants.setForeground(style, Color.CYAN);
-                        break;
-                    case 6:
-                        StyleConstants.setForeground(style, Color.MAGENTA);
-                        break;
-                    case 7:
-                        StyleConstants.setForeground(style, Color.WHITE);
-                        break;
-                    case 8:
-                        StyleConstants.setForeground(style, Color.ORANGE);
-                        break;
-                    case 9:
-                        StyleConstants.setForeground(style, Color.GRAY);
-                        break;
-                }
-            } else if (text.charAt(i) >= '0' && text.charAt(i) <= '9') {
-
-            } else {
-               append_char(style, text.charAt(i)); 
+        text = text+"\n";
+        String colored_text = "";
+        String[] colors = {"#000000","#f31415","#0af60a","#fefe00","#0d0df8","#0ef3f4","#fd02fe","#ffffff","#fd7d00", "#8a8e93"};
+        int prevCaret = text.length()-1;
+        for (int i = text.length()-1; i >= 0; i--) {
+            if (text.charAt(i) == '^' && (text.charAt(i+1) >= '0' && text.charAt(i+1) <= '9')) {
+                int colorNum = Integer.parseInt(text.charAt(i+1)+"");
+                String substring = text.substring(i+2, prevCaret);
+                prevCaret = i;
+                colored_text = "<span style=\"color: "+colors[colorNum]+";\">"+substring+"</span>"+colored_text;
             }
-             
-            
         }
-        // New line
-        append_char(style, '\n');
+        appendText(colored_text);
+        
     }
 
-    private void append_char(Style style, char x) {
-        StyledDocument document = getStyledDocument();
-        try {                
-            document.insertString(document.getLength(),x+"", style);
-        } catch (BadLocationException ble) {                
-            ble.printStackTrace();
+    public void appendText(String text) {
+        if (!getText().isEmpty()) {            
+            try {
+                String prevTextWithTags = getText();                
+                Pattern p = Pattern.compile("<html>(.+?)</html>",Pattern.DOTALL);               
+                Matcher m = p.matcher(prevTextWithTags);
+                if (m.find()) {
+                    String textNoTags = m.group(1);
+                    setText("<html>"+textNoTags+text+"<br></html>");
+                }
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+        } else {
+            setText("<html>"+text+"<br></html>");
         }
+                
+        
+    }    
+    
+
+    public void clearText() {
+        setText("");
     }
+
+    
+    
 }
